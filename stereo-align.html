@@ -1228,10 +1228,14 @@ void main() {
       -state.flat.panY / (eyeH * fit)
     );
 
+    // Signs describe where the right eye is turned (+yaw → right, +pitch → up),
+    // so the sampled content slides the other way: +yaw reads further right,
+    // while +pitch must read *higher* rows. UV v grows downwards, hence the
+    // minus on the v shift — a positive one would throw the content upwards.
     const yawRad = state.angles.yaw * D2R;
     const pitchRad = state.angles.pitch * D2R;
     const dxPx = (yawRad / FLAT_FOV_RAD) * eyeW;
-    const dyPx = (pitchRad / FLAT_FOV_RAD) * eyeH;
+    const dyPx = -(pitchRad / FLAT_FOV_RAD) * eyeH;
     gl.uniform2f(uniforms.uRightShift, dxPx / eyeW, dyPx / eyeH);
     gl.uniform1f(uniforms.uRightRot, -state.angles.roll * D2R);
     gl.uniform1f(uniforms.uRightZoom, state.zoom);
