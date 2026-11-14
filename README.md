@@ -1,4 +1,4 @@
-﻿# MemoVR
+# MemoVR
 
 Public product / support / privacy pages for store listing (Quest, Pico, etc.).  
 Copy aligned with the in-app user guide (`软件使用说明.md` in the main app repo).
@@ -13,3 +13,5 @@ Copy aligned with the in-app user guide (`软件使用说明.md` in the main app
 
 `index.html` and `product_page.html` share the same product / support content (overview, controls, formats).  
 Source drafts also live in the main app repo under `app_store_docs/`.
+
+维护：本机沙箱环境下推送报错的处理步骤见 [`GITHUB_PUSH.md`](GITHUB_PUSH.md)。
