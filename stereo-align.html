@@ -121,13 +121,6 @@
   .btn.ghost:hover { color: var(--text); background: #121a26; }
   .btn.icon { width: 32px; padding: 0; font-size: 14px; font-weight: 600; }
   .btn.wide { width: 100%; }
-  .btn.osv {
-    border-color: #285156;
-    background: #0d1e22;
-    color: #9fe8ec;
-  }
-  .btn.osv:hover { border-color: #3d7b82; background: #122a2f; color: #d8fdff; }
-  .btn.osv:disabled { opacity: .45; }
   .label-short { display: none; }
 
   /* ── layout ──────────────────────────────────────────────── */
@@ -229,34 +222,6 @@
     box-shadow: inset 0 0 0 1px rgba(120, 190, 255, .12), 0 2px 6px rgba(0, 0, 0, .25);
   }
   .seg button:focus-visible { outline: 1px solid var(--accent); outline-offset: 0; }
-
-  .select-wrap { position: relative; }
-  .select-wrap::after {
-    content: "";
-    position: absolute;
-    right: 13px;
-    top: 50%;
-    width: 6px;
-    height: 6px;
-    border-right: 1.5px solid var(--muted);
-    border-bottom: 1.5px solid var(--muted);
-    transform: translateY(-68%) rotate(45deg);
-    pointer-events: none;
-  }
-  select {
-    width: 100%;
-    height: 32px;
-    padding: 0 32px 0 10px;
-    border: 1px solid var(--line-2);
-    border-radius: 8px;
-    background: #0a0f17;
-    color: var(--text);
-    font-size: 12px;
-    appearance: none;
-    cursor: pointer;
-  }
-  select:hover { border-color: #34465c; }
-  select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(82, 214, 232, .13); }
 
   .check {
     display: flex;
@@ -388,26 +353,6 @@
     box-shadow: 0 0 0 3px rgba(56, 207, 226, .12);
   }
   input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(56, 207, 226, .25); }
-
-  .subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 10px; margin-top: 10px; }
-  .subgrid label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10.5px; }
-  .subgrid .num { width: 100%; text-align: right; }
-  .advanced { margin-top: 10px; }
-  .advanced summary {
-    list-style: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--dim);
-    font-size: 10.5px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .advanced summary::-webkit-details-marker { display: none; }
-  .advanced summary::before { content: "+"; width: 10px; font-family: var(--mono); }
-  .advanced[open] summary::before { content: "−"; }
-  .advanced summary:hover { color: var(--muted); }
-  .advanced .subgrid { margin-top: 8px; }
 
   /* ── stage ───────────────────────────────────────────────── */
   #stage {
@@ -688,7 +633,6 @@
     .brand { gap: 8px; }
     .brand-text strong { font-size: 13px; }
     .btn.primary { height: 30px; padding: 0 9px; font-size: 11.5px; }
-    .btn.osv { height: 30px; padding: 0 9px; font-size: 11.5px; }
     .btn.ghost.icon { width: 30px; height: 30px; }
     .hud { font-size: 9.5px; }
     .label-long { display: none; }
@@ -715,7 +659,7 @@
       <div class="mark" aria-hidden="true"><span class="r"></span><span class="c"></span></div>
       <div class="brand-text">
         <strong>VR180 立体对齐台</strong>
-        <span>图片 / OSV 双鱼眼 · 右眼 yaw / pitch / roll / zoom 手动对齐</span>
+        <span>图片 / MP4 SBS·TB / OSV · 右眼 yaw / pitch / roll / zoom 手动对齐</span>
       </div>
     </div>
     <div class="top-actions">
@@ -723,8 +667,7 @@
         <span class="file-name" id="fileName"></span>
         <span class="file-dims" id="fileDims"></span>
       </div>
-      <button class="btn primary" id="openTop" type="button" aria-label="打开图片"><span class="label-long">打开图片</span><span class="label-short">图片</span></button>
-      <button class="btn osv" id="openOsvTop" type="button" title="打开 OSV / 双路鱼眼视频">OSV</button>
+      <button class="btn primary" id="openTop" type="button" aria-label="打开图片、MP4 或 OSV 文件"><span class="label-long">打开文件</span><span class="label-short">打开</span></button>
       <button class="btn ghost icon" id="helpToggle" type="button" title="使用说明" aria-label="使用说明">?</button>
     </div>
   </header>
@@ -733,7 +676,7 @@
     <aside id="panel">
       <section class="section">
         <div class="section-head">
-          <h2>图像</h2>
+          <h2>素材</h2>
           <span class="badge" id="imageBadge">未载入</span>
         </div>
 
@@ -746,62 +689,12 @@
         </div>
 
         <label class="check"><input type="checkbox" id="swapEyes"> 交换左右眼</label>
-
-        <div class="field" id="projectionField">
-          <label for="projection">投影方式</label>
-          <div class="select-wrap">
-            <select id="projection">
-              <option value="equirect">等距柱状（VR180）</option>
-              <option value="fisheye">鱼眼（等距投影）</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="equirectOpts">
-          <div class="field">
-            <label for="hfovMode">每眼水平视角</label>
-            <div class="select-wrap">
-              <select id="hfovMode">
-                <option value="auto">自动</option>
-                <option value="180">180°（VR180）</option>
-                <option value="360">360°（全景）</option>
-              </select>
-            </div>
-            <p class="hint" id="hfovHint">当前：180°</p>
-          </div>
-        </div>
-
-        <div id="fisheyeOpts" hidden>
-          <div class="subgrid">
-            <div>
-              <label for="fishFov">镜头视角 (°)</label>
-              <input class="num" id="fishFov" type="number" min="120" max="220" step="0.1" value="180">
-            </div>
-            <div>
-              <label for="fishScale">圆半径 (%)</label>
-              <input class="num" id="fishScale" type="number" min="50" max="120" step="0.5" value="100">
-            </div>
-          </div>
-          <details class="advanced">
-            <summary>圆心微调</summary>
-            <div class="subgrid">
-              <div>
-                <label for="fishOx">圆心 X (%)</label>
-                <input class="num" id="fishOx" type="number" min="-25" max="25" step="0.1" value="0">
-              </div>
-              <div>
-                <label for="fishOy">圆心 Y (%)</label>
-                <input class="num" id="fishOy" type="number" min="-25" max="25" step="0.1" value="0">
-              </div>
-            </div>
-          </details>
-          <p class="hint">圆直径按每眼短边计算；默认圆心居中，适合常见双鱼眼 SBS。</p>
-        </div>
+        <p class="hint" id="layoutHint">图片 / MP4 默认按宽高比自动判断；不对时点上面切换。</p>
       </section>
 
       <section class="section" id="videoSection" hidden>
         <div class="section-head">
-          <h2>OSV 时间轴</h2>
+          <h2 id="videoTitle">OSV 时间轴</h2>
           <span class="badge" id="videoBadge">双鱼眼</span>
         </div>
 
@@ -809,14 +702,14 @@
           <label for="videoTime">抽帧时间</label>
           <span class="mono" id="videoTimeOut">0.00 / 0.00 s</span>
         </div>
-        <input id="videoTime" type="range" min="0" max="1" step="0.01" value="0" aria-label="OSV 抽帧时间">
+        <input id="videoTime" type="range" min="0" max="1" step="0.01" value="0" aria-label="视频抽帧时间">
 
         <div class="video-actions">
           <button class="btn" id="extractBtn" type="button">抽取当前帧</button>
           <span class="video-status" id="videoStatus">松手即抽帧</span>
         </div>
 
-        <p class="hint">时间轴松手后从最近的关键帧解码到目标帧；8K 双路约需 1–3 秒。</p>
+        <p class="hint" id="videoHint">时间轴松手后从最近的关键帧解码到目标帧；8K 双路约需 1–3 秒。</p>
       </section>
 
       <section class="section">
@@ -826,7 +719,7 @@
         </div>
 
         <div class="hint" style="margin: 0 0 4px;">
-          <div id="poseHint">右眼姿态：<span style="font-family: var(--mono); color: #c4d9ea;">R = Ry(yaw)·Rx(pitch)·Rz(roll)</span></div>
+          <div id="poseHint">右眼只做 2D 平移 / 旋转 / 缩放，源画面不变形。</div>
           <div style="margin-top: 3px;">Zoom 单独缩放右眼，1 = 不变；角度范围 ±3°。</div>
         </div>
 
@@ -889,28 +782,12 @@
           <span class="badge" id="modeBadge">红蓝</span>
         </div>
 
-        <div class="field" style="margin-bottom: 11px;">
-          <label>显示方式</label>
-          <div class="seg" id="displaySeg" role="group" aria-label="显示方式">
-            <button type="button" data-display="flat" class="active">原始（无形变）</button>
-            <button type="button" data-display="persp">透视（球面）</button>
-          </div>
-        </div>
-
         <div class="seg" id="modeSeg" role="group" aria-label="视图模式">
           <button type="button" data-mode="anaglyph" class="active">红蓝</button>
           <button type="button" data-mode="diff">差异</button>
           <button type="button" data-mode="blend">叠加</button>
           <button type="button" data-mode="left">左眼</button>
           <button type="button" data-mode="right">右眼</button>
-        </div>
-
-        <div class="field" id="fovField" hidden>
-          <div class="field-line">
-            <label for="fovRange">视场（垂直）</label>
-            <span class="mono" id="fovOut">80°</span>
-          </div>
-          <input id="fovRange" type="range" min="5" max="130" step="1" value="80" aria-label="视场">
         </div>
 
         <div class="field" id="flatZoomField">
@@ -926,19 +803,15 @@
           <label class="check" style="margin-top: 0;"><input type="checkbox" id="gridToggle"> 网格</label>
         </div>
 
-        <p class="hint" id="viewHint">原始画面按像素比例显示；拖动平移，滚轮缩放，双击回中。右眼只做 2D 平移/旋转/缩放。</p>
+        <p class="hint" id="viewHint">画面按源像素比例显示；拖动平移，滚轮缩放，双击回中。右眼只做 2D 平移 / 旋转 / 缩放。</p>
       </section>
 
       <section class="section">
         <div class="section-head"><h2>输出</h2></div>
-        <div class="eqline" id="stereoEq">stereo_*  yaw +0.00°  pitch +0.00°  roll +0.00°</div>
+        <div class="eqline" id="stereoEq">右眼  yaw +0.00°  pitch +0.00°  roll +0.00°</div>
         <button class="btn wide" id="copyBtn" type="button" style="margin-top: 10px;">复制校正参数</button>
         <p class="note">
-          写入 VR180-Silver-Bullet 的 <span style="font-family: var(--mono);">stereo_*</span> 滑块时，
-          取本角度的约一半（那边左右眼各转一半）。
-        </p>
-        <p class="note">
-          原始视图下的右眼校正是 2D 相似变换（平移/旋转/缩放），属于近似；需要精确球面参数时切到「透视」复核。
+          右眼校正是 2D 相似变换（平移 / 旋转 / 缩放），不是球面重投影，属于近似对齐。
         </p>
         <p class="note">
           Zoom 与 VR180SBS / VR180SBS_cli 的 <span style="font-family: var(--mono);">--zoom</span> 含义一致：
@@ -950,40 +823,33 @@
         <summary>使用说明 / 快捷键</summary>
         <div class="help-body">
           <h3>加载</h3>
-          <p>选择、拖入或 <kbd>Ctrl</kbd>+<kbd>V</kbd> 粘贴一张 VR180 立体图。默认按中间一刀切分左右两眼；上下叠放的图可切到「上下 TB」。图片只在本机浏览器中解码渲染，不会上传。</p>
+          <p>图片、MP4 与 OSV 共用一个打开入口：点「打开文件」、拖入，或 <kbd>Ctrl</kbd>+<kbd>V</kbd> 粘贴一张 VR180 立体图。图片 / MP4 默认按宽高比自动判断：横向切左右 SBS，竖向切上下 TB；判断不对时可手动切换。素材只在本机浏览器中解码渲染，不会上传。</p>
+
+          <h3>MP4 立体视频</h3>
+          <p>点「打开文件」选 MP4。加载后按画面比例自动选择 SBS / TB，拖动时间轴松手即抽帧；支持 H.264 与浏览器可解码的 HEVC。8K HEVC 通常需要系统 / 显卡硬解，<kbd>Chrome</kbd> / <kbd>Edge</kbd> 兼容性最好。</p>
+          <p>若 MP4 内是同一条画面里的左右或上下双画面，按「立体布局」切分；若文件里有两条独立视频轨（OSV 双鱼眼），则会自动按双轨读取，不切分布局。</p>
 
           <h3>OSV 双鱼眼视频</h3>
-          <p>点顶栏「OSV」选文件。工具读取 MP4 里的两条 HEVC 视频轨，用 WebCodecs 解码首帧；拖动时间轴后松手（或点「抽取当前帧」）会从最近的关键帧解到目标帧。<kbd>Chrome</kbd> / <kbd>Edge</kbd> 且系统支持 HEVC 硬解时可用。</p>
-          <p>原始视图直接显示鱼眼帧；切到「透视」时使用通用 195° 等距鱼眼近似，首帧会自动估圆半径和圆心，也可以在「鱼眼」参数里手动调。不解析 <span style="font-family: var(--mono);">djmd</span> 标定；若左右眼反了，勾选「交换左右眼」。8K 双路抽帧约 1–3 秒。</p>
-
-          <h3>显示方式</h3>
-          <p><b>原始（无形变）</b>：图片 / 视频按源像素比例直接显示，不做透视或鱼眼去畸变；右眼只做 2D 平移 / 旋转 / 缩放。默认使用这个方式。</p>
-          <p><b>透视（球面）</b>：把源画面当作球面投影来查看；右眼按下面的旋转采样。适合检查去畸变效果和精确的球面校正参数。</p>
+          <p>同样用「打开文件」选择 <span style="font-family: var(--mono);">.osv</span>，或包含两条 HEVC 视频轨的 MP4；工具会自动识别并切到双轨模式。它读取 MP4 里的两条 HEVC 视频轨，用 WebCodecs 解码首帧；拖动时间轴后松手（或点「抽取当前帧」）会从最近的关键帧解到目标帧。<kbd>Chrome</kbd> / <kbd>Edge</kbd> 且系统支持 HEVC 硬解时可用。</p>
+          <p>鱼眼帧按源像素直接显示，不做球面去畸变；不解析 <span style="font-family: var(--mono);">djmd</span> 标定；若左右眼反了，勾选「交换左右眼」。8K 双路抽帧约 1–3 秒。</p>
 
           <h3>对齐</h3>
-          <p>左眼不动。透视视图下，右眼按下面的旋转采样叠到左眼上；原始视图下换成 2D 相似变换：</p>
-          <div class="formula">透视：R = Ry(yaw) · Rx(pitch) · Rz(roll)</div>
+          <p>左眼不动，右眼做 2D 相似变换（平移 / 旋转 / 缩放）叠到左眼上。</p>
           <p>戴红/青眼镜看红蓝模式；没有眼镜就看「差异」模式（越黑越对齐）或「叠加」。把重影调到最小时，三个角度就是右眼相对左眼的校正量。</p>
           <p>先调旋转/平移，再用 Zoom 修正左右眼的焦距/视场差：Zoom = 1 不变，&gt;1 放大右眼，&lt;1 缩小右眼（范围 0.9–1.1）。</p>
           <p>立体图本身有视差：请让远处的背景对齐；近景残留的重影是正常的，Yaw 尤其应以远景为准。</p>
 
           <h3>操作</h3>
           <ul>
-            <li>原始：拖动平移，滚轮缩放；透视：拖动环视，滚轮缩放；双击回中。</li>
+            <li>拖动平移，滚轮缩放，双击回中。</li>
             <li><kbd>←</kbd> <kbd>→</kbd> Yaw，<kbd>↑</kbd> <kbd>↓</kbd> Pitch，<kbd>Q</kbd> <kbd>E</kbd> Roll，<kbd>Z</kbd> <kbd>X</kbd> Zoom；<kbd>Shift</kbd> 加大 10 倍步进。</li>
             <li><kbd>0</kbd> 视图回中，<kbd>R</kbd> 角度/缩放复位，<kbd>1</kbd>–<kbd>5</kbd> 切换视图。</li>
             <li>角度滑杆范围 ±3°，Zoom 范围 0.9–1.1；数值框可直接输入精确数值。</li>
           </ul>
-
-          <h3>投影</h3>
-          <p>下面的投影设置只在「透视（球面）」视图生效。「等距柱状」按每眼 180°×180°（VR180）或 360°×180°（全景）解释，水平视角可自动判断。「鱼眼」按等距投影解释，可调 FOV、圆半径与圆心，适合未拼接的双鱼眼 SBS 原图。原始视图不使用这些设置，直接把两只眼的源画面叠在一起。</p>
-
-          <h3>与 Silver Bullet 的关系</h3>
-          <p>本工具只转右眼，所以得到的是两眼之间的相对旋转；Silver Bullet 的 <span style="font-family: var(--mono);">stereo_yaw / pitch / roll</span> 对左右眼各加一半、各减一半，因此填过去时取本角度的一半（小角度近似）。原始视图下的 2D 参数是近似值，写回前建议切到「透视」复核。</p>
         </div>
       </details>
 
-      <p class="footnote">本地处理 · WebGL2 · 图片 / OSV 双鱼眼抽帧</p>
+      <p class="footnote">本地处理 · WebGL2 · 图片 / MP4 SBS·TB / OSV 抽帧</p>
     </aside>
 
     <section id="stage" tabindex="0" aria-label="立体对比视图">
@@ -996,18 +862,17 @@
             <span class="ring cyan"></span>
             <span class="split"></span>
           </div>
-          <h2>拖入 VR180 立体图或 OSV</h2>
-          <p>图片会按中间切成左右眼；OSV 直接解析双鱼眼视频。左眼入红、右眼入青，原始画面不做形变，再手动对齐右眼。</p>
+          <h2>拖入立体图、MP4 或 OSV</h2>
+          <p>图片与 MP4 会按 SBS / TB 切成左右眼，OSV 直接解析双鱼眼视频。左眼入红、右眼入青，原始画面不做形变，再手动对齐右眼。</p>
           <div class="empty-actions">
-            <button class="btn primary" id="openEmpty" type="button">选择本地图片</button>
-            <button class="btn osv" id="openOsvEmpty" type="button">打开 OSV 视频</button>
+            <button class="btn primary" id="openEmpty" type="button">选择本地文件</button>
           </div>
-          <p class="empty-note">JPG / PNG / WebP · OSV 双鱼眼 · 8K · 全程本机处理</p>
+          <p class="empty-note">JPG / PNG / WebP · MP4 SBS / TB · OSV 双鱼眼 · 8K · 全程本机处理</p>
         </div>
       </div>
 
       <div id="loading" hidden><div class="spinner"></div></div>
-      <div id="dropHint" hidden><div class="drop-label">松开鼠标以载入图片 / OSV</div></div>
+      <div id="dropHint" hidden><div class="drop-label">松开鼠标以载入图片 / MP4 / OSV</div></div>
 
       <div id="gridOverlay" hidden aria-hidden="true">
         <i class="v" style="left: 33.333%"></i>
@@ -1019,7 +884,7 @@
       <div class="hud" id="hud" hidden>
         <div class="group">
           <span class="kind" id="hudMode">红蓝</span>
-          <span id="hudView">视线 <b>0.0°</b> / <b>0.0°</b> · 视场 <b>80°</b></span>
+          <span id="hudView">原始视图 · 缩放 <b>100%</b></span>
         </div>
         <div class="group angles" id="hudAngles">
           <span><em>yaw</em> <b>+0.00</b></span>
@@ -1033,8 +898,7 @@
   </main>
 </div>
 
-<input type="file" id="fileInput" accept="image/*" hidden>
-<input type="file" id="osvInput" accept=".osv,.OSV,video/mp4" hidden>
+<input type="file" id="fileInput" accept="image/*,video/mp4,.mp4,.m4v,.osv,.OSV" hidden>
 
 <script>
 (() => {
@@ -1058,7 +922,6 @@
   const stage = $('#stage');
   const panel = $('#panel');
   const fileInput = $('#fileInput');
-  const osvInput = $('#osvInput');
   const empty = $('#empty');
   const loading = $('#loading');
   const dropHint = $('#dropHint');
@@ -1069,22 +932,18 @@
   const fileName = $('#fileName');
   const fileDims = $('#fileDims');
   const imageBadge = $('#imageBadge');
-  const hfovHint = $('#hfovHint');
   const modeBadge = $('#modeBadge');
-  const fovRange = $('#fovRange');
-  const fovOut = $('#fovOut');
-  const fovField = $('#fovField');
-  const flatZoomField = $('#flatZoomField');
   const flatZoomRange = $('#flatZoomRange');
   const flatZoomOut = $('#flatZoomOut');
-  const viewHint = $('#viewHint');
   const videoSection = $('#videoSection');
+  const videoTitle = $('#videoTitle');
+  const videoBadge = $('#videoBadge');
+  const videoHint = $('#videoHint');
   const videoTime = $('#videoTime');
   const videoTimeOut = $('#videoTimeOut');
   const videoStatus = $('#videoStatus');
-  const videoBadge = $('#videoBadge');
   const layoutField = $('#layoutField');
-  const projectionField = $('#projectionField');
+  const layoutHint = $('#layoutHint');
 
   // ════════════════════════════════════════════════════════════════
   //  State
@@ -1098,35 +957,36 @@
     layout: 'sbs',          // 'sbs' | 'tb'
     autoLayout: true,
     swap: false,
-    projection: 'equirect', // 'equirect' | 'fisheye'
-    hfovMode: 'auto',       // 'auto' | '180' | '360'
-    fisheye: { fov: 180, scale: 1, ox: 0, oy: 0 },
     angles: { yaw: 0, pitch: 0, roll: 0 },
     zoom: 1,                // right-eye scale, 1 = neutral
-    view: { yaw: 0, pitch: 0, fov: 80 },
-    displayMode: 'flat',    // 'flat' = raw source, 'persp' = spherical view
     flat: { zoom: 1, panX: 0, panY: 0 },
     mode: 'anaglyph',
     grid: false,
     video: null,            // { file, tracks, duration, width, height, name }
     videoMode: false,
     videoTime: 0,
-    stillProjection: 'equirect',
   };
 
   let loadSeq = 0;
   let texSeq = 0;
   let videoSeq = 0;
+  let videoRequest = 0;
   let videoBusy = false;
+  let pendingSplit = false;
   let busy = false;
   let renderQueued = false;
   let toastTimer = 0;
   let dragState = null;
   let dragDepth = 0;
 
-  const OSV_FOV = 195;       // DJI Osmo 360 lens, generic equidistant approximation
   const OSV_MAX_GOP = 90;    // stop decoding more than this many samples per click
+  const MAX_EYE_PIXELS = 16 * 1024 * 1024;
+  const VIDEO_TIMEOUT = 15000;
   const videoConfigCache = new Map();
+
+  // Flat view treats each eye as a 180° projection when turning yaw / pitch
+  // into a pixel shift of the right eye.
+  const FLAT_FOV_RAD = Math.PI;
 
   // ════════════════════════════════════════════════════════════════
   //  WebGL
@@ -1151,20 +1011,6 @@ uniform sampler2D uLeftTex;
 uniform sampler2D uRightTex;
 
 uniform vec2  uRes;
-uniform float uAspect;
-uniform float uTanHalfFov;
-uniform mat3  uViewMat;
-uniform mat3  uRightMat;
-
-uniform int   uProjection;   // 0 = equirect, 1 = fisheye
-uniform float uHfov;         // equirect horizontal FOV (radians)
-uniform float uFishFov;      // fisheye full FOV (radians)
-uniform float uFishScale;
-uniform vec2  uFishOffset;   // eye-local UV offset
-uniform vec2  uEyeSize;      // one eye, pixels
-uniform float uZoom;         // right-eye scale: 1 = neutral, >1 enlarges
-
-uniform int   uDisplayMode;  // 0 = raw/flat, 1 = perspective/spherical
 uniform vec2  uFlatScale;    // screen-normalised → eye UV scale
 uniform vec2  uFlatPan;      // eye UV pan
 uniform vec2  uRightShift;   // right-eye 2D shift, eye UV
@@ -1176,31 +1022,8 @@ uniform float uDiffGain;
 
 out vec4 fragColor;
 
-const float PI = 3.141592653589793;
-
 float luma(vec3 c) {
   return dot(c, vec3(0.2126, 0.7152, 0.0722));
-}
-
-// Direction in the eye's local frame → normalised texture coordinate.
-// zoom scales the image about the optical centre: >1 magnifies the eye,
-// <1 shrinks it (matches the right-eye scale of the DJI VR180SBS tool).
-vec2 eyeUV(vec3 d, float zoom) {
-  if (uProjection == 0) {
-    float lon = atan(d.x, d.z);
-    float lat = asin(clamp(d.y, -1.0, 1.0));
-    return vec2(0.5 + (lon / uHfov) / zoom,
-                0.5 - (lat / PI) / zoom);
-  }
-
-  // Equidistant fisheye: theta = angle from the optical axis (+Z).
-  float theta = acos(clamp(d.z, -1.0, 1.0));
-  float st = sqrt(max(0.0, 1.0 - d.z * d.z));
-  vec2 cs = st > 1e-7 ? d.xy / st : vec2(1.0, 0.0);
-  float rN = theta / max(uFishFov * 0.5, 1e-4) / zoom;
-  float R = 0.5 * min(uEyeSize.x, uEyeSize.y) * uFishScale;
-  vec2 px = vec2(rN * R * cs.x, -rN * R * cs.y);
-  return vec2(0.5 + px.x / uEyeSize.x, 0.5 + px.y / uEyeSize.y) + uFishOffset;
 }
 
 vec4 sampleUV(sampler2D tex, vec2 uv) {
@@ -1211,37 +1034,19 @@ vec4 sampleUV(sampler2D tex, vec2 uv) {
   return vec4(c.rgb * c.a, 1.0);
 }
 
-vec4 sampleEye(sampler2D tex, vec3 d, float zoom) {
-  return sampleUV(tex, eyeUV(d, zoom));
-}
-
 void main() {
-  vec4 l;
-  vec4 r;
-
-  if (uDisplayMode == 0) {
-    // Raw/flat: the source pixels keep their original shape. The only
-    // right-eye adjustment is a 2D similarity (shift / rotation / scale).
-    // gl_FragCoord is bottom-up; texture v=0 is the top row of the source.
-    vec2 screenUV = vec2(gl_FragCoord.x / uRes.x, 1.0 - gl_FragCoord.y / uRes.y);
-    vec2 uv0 = (screenUV - 0.5) * uFlatScale + 0.5 + uFlatPan;
-    vec2 p = (uv0 - 0.5) / uRightZoom;
-    float c = cos(uRightRot);
-    float s = sin(uRightRot);
-    p = mat2(c, -s, s, c) * p;
-    vec2 uvR = 0.5 + p + uRightShift;
-    l = sampleUV(uLeftTex, uv0);
-    r = sampleUV(uRightTex, uvR);
-  } else {
-    vec2 ndc = (gl_FragCoord.xy / uRes) * 2.0 - 1.0;
-    vec3 camDir = normalize(vec3(ndc.x * uAspect * uTanHalfFov,
-                                ndc.y * uTanHalfFov,
-                                1.0));
-    vec3 dir  = uViewMat * camDir;
-    vec3 dirR = uRightMat * dir;
-    l = sampleEye(uLeftTex, dir, 1.0);
-    r = sampleEye(uRightTex, dirR, uZoom);
-  }
+  // Raw/flat: the source pixels keep their original shape. The only
+  // right-eye adjustment is a 2D similarity (shift / rotation / scale).
+  // gl_FragCoord is bottom-up; texture v=0 is the top row of the source.
+  vec2 screenUV = vec2(gl_FragCoord.x / uRes.x, 1.0 - gl_FragCoord.y / uRes.y);
+  vec2 uv0 = (screenUV - 0.5) * uFlatScale + 0.5 + uFlatPan;
+  vec2 p = (uv0 - 0.5) / uRightZoom;
+  float c = cos(uRightRot);
+  float s = sin(uRightRot);
+  p = mat2(c, -s, s, c) * p;
+  vec2 uvR = 0.5 + p + uRightShift;
+  vec4 l = sampleUV(uLeftTex, uv0);
+  vec4 r = sampleUV(uRightTex, uvR);
 
   vec3 col;
   if (uMode == 0) {
@@ -1306,10 +1111,8 @@ void main() {
 
       uniforms = {};
       [
-        'uLeftTex', 'uRightTex', 'uRes', 'uAspect', 'uTanHalfFov',
-        'uViewMat', 'uRightMat', 'uProjection', 'uHfov', 'uFishFov',
-        'uFishScale', 'uFishOffset', 'uEyeSize', 'uZoom',
-        'uDisplayMode', 'uFlatScale', 'uFlatPan', 'uRightShift', 'uRightRot', 'uRightZoom',
+        'uLeftTex', 'uRightTex', 'uRes',
+        'uFlatScale', 'uFlatPan', 'uRightShift', 'uRightRot', 'uRightZoom',
         'uMode', 'uDiffGain',
       ].forEach((name) => {
         uniforms[name] = gl.getUniformLocation(program, name);
@@ -1375,42 +1178,6 @@ void main() {
     return tex;
   }
 
-  // Row-major R = Ry(yaw) * Rx(pitch) * Rz(roll), matching
-  // VR180-Silver-Bullet's `ypr_to_mat3_row_major`, returned column-major
-  // for WebGL's uniformMatrix3fv.
-  function yprMatrix(yawDeg, pitchDeg, rollDeg) {
-    const y = yawDeg * D2R;
-    const p = pitchDeg * D2R;
-    const r = rollDeg * D2R;
-    const cy = Math.cos(y), sy = Math.sin(y);
-    const cp = Math.cos(p), sp = Math.sin(p);
-    const cr = Math.cos(r), sr = Math.sin(r);
-
-    const m00 = cy * cr + sy * sp * sr;
-    const m01 = -cy * sr + sy * sp * cr;
-    const m02 = sy * cp;
-    const m10 = cp * sr;
-    const m11 = cp * cr;
-    const m12 = -sp;
-    const m20 = -sy * cr + cy * sp * sr;
-    const m21 = sy * sr + cy * sp * cr;
-    const m22 = cy * cp;
-
-    return new Float32Array([
-      m00, m10, m20,
-      m01, m11, m21,
-      m02, m12, m22,
-    ]);
-  }
-
-  function resolvedHfovDeg() {
-    if (state.hfovMode === '180') return 180;
-    if (state.hfovMode === '360') return 360;
-    if (!state.eyeSize) return 180;
-    const aspect = state.eyeSize.w / Math.max(1, state.eyeSize.h);
-    return aspect > 1.55 ? 360 : 180;
-  }
-
   // ════════════════════════════════════════════════════════════════
   //  Rendering
   // ════════════════════════════════════════════════════════════════
@@ -1445,23 +1212,6 @@ void main() {
     gl.uniform1i(uniforms.uLeftTex, 0);
     gl.uniform1i(uniforms.uRightTex, 1);
     gl.uniform2f(uniforms.uRes, w, h);
-    gl.uniform1f(uniforms.uAspect, w / h);
-    gl.uniform1f(uniforms.uTanHalfFov, Math.tan(clamp(state.view.fov, 1, 179) * 0.5 * D2R));
-
-    gl.uniformMatrix3fv(uniforms.uViewMat, false, yprMatrix(state.view.yaw, -state.view.pitch, 0));
-    gl.uniformMatrix3fv(uniforms.uRightMat, false, yprMatrix(state.angles.yaw, state.angles.pitch, state.angles.roll));
-
-    gl.uniform1i(uniforms.uProjection, state.projection === 'fisheye' ? 1 : 0);
-    gl.uniform1f(uniforms.uHfov, resolvedHfovDeg() * D2R);
-    gl.uniform1f(uniforms.uFishFov, state.fisheye.fov * D2R);
-    gl.uniform1f(uniforms.uFishScale, state.fisheye.scale);
-    gl.uniform2f(uniforms.uFishOffset, state.fisheye.ox, state.fisheye.oy);
-    gl.uniform2f(
-      uniforms.uEyeSize,
-      state.eyeSize ? state.eyeSize.w : 1,
-      state.eyeSize ? state.eyeSize.h : 1
-    );
-    gl.uniform1f(uniforms.uZoom, state.zoom);
     gl.uniform1i(uniforms.uMode, Math.max(0, MODES.indexOf(state.mode)));
     gl.uniform1f(uniforms.uDiffGain, 3.0);
 
@@ -1471,7 +1221,6 @@ void main() {
     const cw = Math.max(1, stage.clientWidth);
     const ch = Math.max(1, stage.clientHeight);
     const fit = Math.max(1e-6, Math.min(cw / eyeW, ch / eyeH) * state.flat.zoom);
-    gl.uniform1i(uniforms.uDisplayMode, state.displayMode === 'flat' ? 0 : 1);
     gl.uniform2f(uniforms.uFlatScale, cw / (eyeW * fit), ch / (eyeH * fit));
     gl.uniform2f(
       uniforms.uFlatPan,
@@ -1481,18 +1230,8 @@ void main() {
 
     const yawRad = state.angles.yaw * D2R;
     const pitchRad = state.angles.pitch * D2R;
-    let dxPx = 0;
-    let dyPx = 0;
-    if (state.videoMode || state.projection === 'fisheye') {
-      const fovRad = Math.max(1e-4, state.fisheye.fov * D2R);
-      const radius = 0.5 * Math.min(eyeW, eyeH) * state.fisheye.scale;
-      dxPx = (yawRad / (fovRad * 0.5)) * radius;
-      dyPx = (pitchRad / (fovRad * 0.5)) * radius;
-    } else {
-      const hfovRad = Math.max(1e-4, resolvedHfovDeg() * D2R);
-      dxPx = (yawRad / hfovRad) * eyeW;
-      dyPx = (pitchRad / Math.PI) * eyeH;
-    }
+    const dxPx = (yawRad / FLAT_FOV_RAD) * eyeW;
+    const dyPx = (pitchRad / FLAT_FOV_RAD) * eyeH;
     gl.uniform2f(uniforms.uRightShift, dxPx / eyeW, dyPx / eyeH);
     gl.uniform1f(uniforms.uRightRot, -state.angles.roll * D2R);
     gl.uniform1f(uniforms.uRightZoom, state.zoom);
@@ -1654,22 +1393,44 @@ void main() {
     requestRender();
   }
 
+  function autoLayoutFor(width, height) {
+    return height > width * 1.15 ? 'tb' : 'sbs';
+  }
+
+  function isVideoFile(file) {
+    const name = (file && file.name) || '';
+    const type = (file && file.type) || '';
+    return /\.(mp4|m4v|osv)$/i.test(name) || /^video\//i.test(type);
+  }
+
+  // Release an <video>-backed entry: object URL, decoder and DOM node.
+  function disposeVideoEntry(entry) {
+    if (!entry) return;
+    if (entry.el) {
+      try { entry.el.pause(); } catch (err) { /* ignore */ }
+      try { entry.el.removeAttribute('src'); } catch (err) { /* ignore */ }
+      try { entry.el.load(); } catch (err) { /* ignore */ }
+      try { entry.el.remove(); } catch (err) { /* ignore */ }
+    }
+    if (entry.url) URL.revokeObjectURL(entry.url);
+  }
+
   async function loadSource(src, name) {
     if (!gl || !glReady) throw new Error('WebGL 2 不可用');
     const token = ++loadSeq;
+    videoRequest += 1; // cancel a pending MP4/OSV probe
+    videoSeq++;        // cancel any in-flight video load / extraction
+    pendingSplit = false;
+    setVideoBusy(false);
 
-    // Leaving OSV video mode: restore the still-image layout/projection UI.
+    // Leaving video mode: drop any <video> decoder / object URL.
     if (state.videoMode) {
-      videoSeq++;
+      const oldVideo = state.video;
       state.video = null;
       state.videoMode = false;
       setVideoModeUI(false);
-      state.projection = state.stillProjection || 'equirect';
-      state.fisheye = { fov: 180, scale: 1, ox: 0, oy: 0 };
-      $('#projection').value = state.projection;
-      syncFisheyeUI();
-      syncProjectionUI();
       videoTime.value = '0';
+      disposeVideoEntry(oldVideo);
     }
 
     setBusy(true);
@@ -1698,14 +1459,9 @@ void main() {
         originalHeight: limited.originalHeight,
       };
 
-      if (state.autoLayout) {
-        const portrait = state.image.height > state.image.width * 1.15;
-        state.layout = portrait ? 'tb' : 'sbs';
-        syncLayoutUI();
-      }
-
-      state.view = { yaw: 0, pitch: 0, fov: 80 };
-      syncViewUI();
+      state.autoLayout = true;
+      state.layout = autoLayoutFor(state.image.width, state.image.height);
+      syncLayoutUI();
 
       await buildEyeTextures();
       if (token !== loadSeq) return;
@@ -1723,14 +1479,14 @@ void main() {
 
   async function loadFile(file) {
     if (!file) return;
-    if (/\.osv$/i.test(file.name || '')) {
-      await loadOsvFile(file);
+    if (isVideoFile(file)) {
+      await loadVideoFile(file);
       return;
     }
     const looksLikeImage = (file.type && file.type.startsWith('image/')) ||
       /\.(jpe?g|png|webp|avif|gif|bmp)$/i.test(file.name || '');
     if (!looksLikeImage) {
-      toast('请选择图片文件（JPG / PNG / WebP）或 OSV 视频');
+      toast('请选择图片、MP4 立体视频或 OSV 文件');
       return;
     }
     try {
@@ -1744,6 +1500,431 @@ void main() {
       console.error('[vr180] load failed:', err);
       toast(`无法读取图片：${err && err.message ? err.message : err}`);
     }
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  //  MP4 / MOV with packed SBS or TB stereo → one frame
+  // ════════════════════════════════════════════════════════════════
+  async function loadVideoFile(file) {
+    if (!file) return;
+    const req = ++videoRequest;
+    const name = file.name || '';
+    const isOsv = /\.osv$/i.test(name);
+
+    // Dual-track HEVC (OSV) still goes through the WebCodecs reader.
+    // Everything else - including ordinary H.264/HEVC MP4 - is opened
+    // with a seekable <video> element and split by the layout below.
+    let tracks = null;
+    try {
+      tracks = await parseMp4(file);
+    } catch (err) {
+      tracks = null;
+    }
+    if (req !== videoRequest) return;
+    if (tracks && tracks.length >= 2) {
+      try {
+        await loadOsvFile(file, tracks);
+      } catch (err) {
+        console.error('[vr180] video load failed:', err);
+        toast(`视频载入失败：${err && err.message ? err.message : err}`);
+      }
+      return;
+    }
+    if (isOsv) {
+      toast('OSV 需要包含两条 HEVC 视频轨的 MP4；该文件未识别到双轨');
+      return;
+    }
+    try {
+      await loadMp4File(file);
+    } catch (err) {
+      console.error('[vr180] video load failed:', err);
+      toast(`视频载入失败：${err && err.message ? err.message : err}`);
+    }
+  }
+
+  function createMp4Entry(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const el = document.createElement('video');
+      el.preload = 'auto';
+      el.muted = true;
+      el.playsInline = true;
+      el.setAttribute('playsinline', '');
+      el.setAttribute('aria-hidden', 'true');
+      el.style.cssText =
+        'position:fixed;left:-2px;top:-2px;width:1px;height:1px;opacity:0;pointer-events:none;';
+      document.body.appendChild(el);
+
+      let settled = false;
+      const timer = setTimeout(
+        () => fail(new Error('读取视频超时（浏览器可能不支持该编码）')),
+        VIDEO_TIMEOUT
+      );
+
+      function cleanup() {
+        clearTimeout(timer);
+        el.removeEventListener('loadedmetadata', onMeta);
+        el.removeEventListener('error', onError);
+      }
+
+      function fail(err) {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        try { el.pause(); } catch (e) { /* ignore */ }
+        try { el.removeAttribute('src'); el.load(); } catch (e) { /* ignore */ }
+        try { el.remove(); } catch (e) { /* ignore */ }
+        URL.revokeObjectURL(url);
+        reject(err);
+      }
+
+      function onMeta() {
+        if (settled) return;
+        if (!el.videoWidth || !el.videoHeight) {
+          fail(new Error('视频没有可用画面'));
+          return;
+        }
+        settled = true;
+        cleanup();
+        resolve({
+          kind: 'mp4',
+          file,
+          name: file.name || 'video.mp4',
+          el,
+          url,
+          width: el.videoWidth,
+          height: el.videoHeight,
+          duration: Number.isFinite(el.duration) ? el.duration : 0,
+          frameLoaded: false,
+        });
+      }
+
+      function onError() {
+        const code = el.error ? el.error.code : 0;
+        fail(new Error(code === 4
+          ? '浏览器无法解码该视频（可能是不支持的编码；HEVC 需系统 / 显卡支持，可改用 H.264）'
+          : `视频读取失败（错误码 ${code || '未知'}）`));
+      }
+
+      el.addEventListener('loadedmetadata', onMeta);
+      el.addEventListener('error', onError);
+      el.src = url;
+      el.load();
+    });
+  }
+
+  function fitEyeTexture(width, height) {
+    const maxTex = gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 8192;
+    const scale = Math.min(
+      1,
+      maxTex / width,
+      maxTex / height,
+      Math.sqrt(MAX_EYE_PIXELS / (width * height))
+    );
+    return {
+      w: Math.max(2, Math.round(width * scale)),
+      h: Math.max(2, Math.round(height * scale)),
+      scaled: scale < 0.999,
+    };
+  }
+
+  function waitForVideoFrame(video) {
+    return new Promise((resolve) => {
+      let done = false;
+      let timer = 0;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        resolve();
+      };
+      if (typeof video.requestVideoFrameCallback === 'function') {
+        const id = video.requestVideoFrameCallback(finish);
+        timer = setTimeout(() => {
+          try { video.cancelVideoFrameCallback(id); } catch (err) { /* ignore */ }
+          finish();
+        }, 800);
+      } else {
+        timer = setTimeout(finish, 32);
+      }
+    });
+  }
+
+  function seekVideo(video, timeSec) {
+    const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+    let target = clamp(Number(timeSec) || 0, 0, Math.max(0, duration - 0.001));
+    // Nudge by 1 ms so setting currentTime actually fires `seeked` even
+    // when the requested time equals the current one (e.g. first frame).
+    if (duration > 0.01 && Math.abs(video.currentTime - target) < 0.001) {
+      target = target <= 0 ? Math.min(0.001, duration) : target - 0.001;
+    }
+
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const timer = setTimeout(() => finish(new Error('视频定位超时')), VIDEO_TIMEOUT);
+
+      function cleanup() {
+        clearTimeout(timer);
+        video.removeEventListener('seeked', onSeeked);
+        video.removeEventListener('error', onError);
+        video.removeEventListener('loadeddata', onLoaded);
+      }
+
+      function finish(err) {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        if (err) reject(err);
+        else resolve(video.currentTime);
+      }
+
+      function applyFrame() {
+        // `seeked` means the seek completed; rVFC guarantees the new
+        // frame has been presented and can be drawn to a canvas.
+        waitForVideoFrame(video).then(() => finish(), () => finish());
+      }
+
+      function onSeeked() {
+        applyFrame();
+      }
+
+      function onLoaded() {
+        applyFrame();
+      }
+
+      function onError() {
+        finish(new Error('视频定位失败'));
+      }
+
+      video.addEventListener('seeked', onSeeked);
+      video.addEventListener('error', onError);
+
+      // Fragment / live files may not expose a duration. Just wait for
+      // the first decoded frame instead of setting currentTime.
+      if (duration <= 0.01) {
+        if (video.readyState >= 2) applyFrame();
+        else video.addEventListener('loadeddata', onLoaded, { once: true });
+        return;
+      }
+
+      try {
+        video.currentTime = target;
+      } catch (err) {
+        finish(err);
+      }
+    });
+  }
+
+  async function extractMp4Frame(timeSec) {
+    const entry = state.video;
+    if (!entry || entry.kind !== 'mp4' || videoBusy) return;
+    const video = entry.el;
+    const token = videoSeq;
+    setVideoBusy(true);
+
+    try {
+      setVideoStatus('定位中…', true);
+      const actual = await seekVideo(video, timeSec);
+      if (token !== videoSeq || state.video !== entry) return;
+
+      const W = video.videoWidth || entry.width;
+      const H = video.videoHeight || entry.height;
+      if (!W || !H) throw new Error('视频没有画面');
+
+      const sbs = state.layout === 'sbs';
+      const ew = sbs ? Math.floor(W / 2) : W;
+      const eh = sbs ? H : Math.floor(H / 2);
+      if (ew < 2 || eh < 2) throw new Error('视频尺寸过小，无法切成两只眼睛');
+
+      const fit = fitEyeTexture(ew, eh);
+      const cw = fit.w;
+      const ch = fit.h;
+      const left = document.createElement('canvas');
+      const right = document.createElement('canvas');
+      left.width = cw;
+      left.height = ch;
+      right.width = cw;
+      right.height = ch;
+
+      const lx = 0;
+      const ly = 0;
+      const rx = sbs ? W - ew : 0;
+      const ry = sbs ? 0 : H - eh;
+
+      const lctx = left.getContext('2d', { alpha: false });
+      const rctx = right.getContext('2d', { alpha: false });
+      lctx.imageSmoothingEnabled = true;
+      lctx.imageSmoothingQuality = 'high';
+      rctx.imageSmoothingEnabled = true;
+      rctx.imageSmoothingQuality = 'high';
+
+      setVideoStatus('抽帧中…', true);
+      lctx.drawImage(video, lx, ly, ew, eh, 0, 0, cw, ch);
+      rctx.drawImage(video, rx, ry, ew, eh, 0, 0, cw, ch);
+
+      if (token !== videoSeq || state.video !== entry) return;
+
+      let texL = null;
+      let texR = null;
+      try {
+        texL = uploadTexture(left);
+        texR = uploadTexture(right);
+      } catch (err) {
+        if (texL) gl.deleteTexture(texL);
+        if (texR) gl.deleteTexture(texR);
+        throw err;
+      }
+
+      if (token !== videoSeq || state.video !== entry) {
+        gl.deleteTexture(texL);
+        gl.deleteTexture(texR);
+        return;
+      }
+
+      if (state.texLeft) gl.deleteTexture(state.texLeft);
+      if (state.texRight) gl.deleteTexture(state.texRight);
+      state.texLeft = texL;
+      state.texRight = texR;
+      state.eyeSize = { w: cw, h: ch };
+      state.videoTime = actual;
+      entry.frameLoaded = true;
+
+      syncVideoUI();
+      updateInfo();
+      updateHud();
+      requestRender();
+
+      const scaleNote = fit.scaled ? '（已缩小）' : '';
+      setVideoStatus(`帧 @ ${actual.toFixed(2)} s${scaleNote}`, false);
+    } catch (err) {
+      if (token === videoSeq) {
+        console.error('[vr180] MP4 frame failed:', err);
+        toast(`抽帧失败：${err && err.message ? err.message : err}`);
+        setVideoStatus('抽帧失败', false);
+      }
+    } finally {
+      if (token === videoSeq) {
+        setVideoBusy(false);
+        if (pendingSplit && state.video && state.video.kind === 'mp4') {
+          pendingSplit = false;
+          extractMp4Frame(state.videoTime);
+        }
+      }
+    }
+  }
+
+  async function loadMp4File(file) {
+    if (!gl || !glReady) throw new Error('WebGL 2 不可用');
+    const token = ++videoSeq;
+    loadSeq++; // invalidate any still-image load
+    pendingSplit = false;
+    setVideoBusy(false); // cancel an extraction from the previous clip
+    setBusy(true);
+    setVideoStatus('读取视频…', true);
+
+    const prev = {
+      image: state.image ? { ...state.image } : null,
+      layout: state.layout,
+      autoLayout: state.autoLayout,
+      video: state.video,
+      videoMode: state.videoMode,
+      videoTime: state.videoTime,
+    };
+
+    let entry = null;
+    let tookOver = false;
+    try {
+      entry = await createMp4Entry(file);
+      if (token !== videoSeq) {
+        disposeVideoEntry(entry);
+        return;
+      }
+
+      state.autoLayout = true;
+      state.layout = autoLayoutFor(entry.width, entry.height);
+
+      state.video = entry;
+      tookOver = true;
+      state.videoTime = 0;
+      state.image = {
+        name: entry.name,
+        width: entry.width,
+        height: entry.height,
+        video: true,
+        scaled: false,
+        originalWidth: entry.width,
+        originalHeight: entry.height,
+      };
+
+      setVideoModeUI(true, 'mp4');
+      syncLayoutUI();
+      syncVideoUI();
+      empty.hidden = true;
+      hud.hidden = false;
+      updateInfo();
+      updateHud();
+      updateGrid();
+
+      await extractMp4Frame(0);
+      if (token !== videoSeq) {
+        if (state.video !== entry) disposeVideoEntry(entry);
+        if (prev.video && state.video !== prev.video) disposeVideoEntry(prev.video);
+        return;
+      }
+      if (state.video !== entry || !entry.frameLoaded) {
+        throw new Error('首帧抽帧失败');
+      }
+
+      if (prev.video && prev.video !== entry) disposeVideoEntry(prev.video);
+      state.bitmap?.close?.();
+      state.bitmap = null;
+      updateInfo();
+      updateHud();
+      updateGrid();
+      toast(
+        `已载入 ${entry.name}（${entry.width}×${entry.height} · ` +
+        `${state.layout === 'sbs' ? 'SBS' : 'TB'} · ${entry.duration.toFixed(1)} s）`
+      );
+    } catch (err) {
+      if (token !== videoSeq) {
+        // A newer image / video load has taken over; do not restore old state.
+        if (entry && state.video !== entry) disposeVideoEntry(entry);
+        if (tookOver && prev.video && state.video !== prev.video) {
+          disposeVideoEntry(prev.video);
+        }
+        return;
+      }
+      console.error('[vr180] MP4 load failed:', err);
+      toast(`MP4 载入失败：${err && err.message ? err.message : err}`);
+      setVideoStatus('载入失败', false);
+      if (entry && entry !== prev.video) disposeVideoEntry(entry);
+      state.video = prev.videoMode ? prev.video : null;
+      state.videoMode = prev.videoMode;
+      state.videoTime = prev.videoTime;
+      state.image = prev.image;
+      state.layout = prev.layout;
+      state.autoLayout = prev.autoLayout;
+      setVideoModeUI(prev.videoMode, prev.video ? prev.video.kind : null);
+      syncLayoutUI();
+      if (prev.videoMode && prev.video) {
+        syncVideoUI();
+        setVideoStatus('已恢复上一段视频', false);
+      }
+      empty.hidden = !!state.image;
+      hud.hidden = !state.image;
+      updateInfo();
+      updateHud();
+      updateGrid();
+      requestRender();
+    } finally {
+      if (token === videoSeq) setBusy(false);
+    }
+  }
+
+  function extractFrame(timeSec) {
+    if (!state.video) return Promise.resolve();
+    if (state.video.kind === 'osv') return extractOsvFrame(timeSec);
+    return extractMp4Frame(timeSec);
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -2223,56 +2404,12 @@ void main() {
     return tex;
   }
 
-  function detectLensCircle(frame) {
-    try {
-      const S = 256;
-      const c = document.createElement('canvas');
-      c.width = S;
-      c.height = S;
-      const ctx = c.getContext('2d', { willReadFrequently: true });
-      ctx.drawImage(frame, 0, 0, S, S);
-      const d = ctx.getImageData(0, 0, S, S).data;
-      let minX = S;
-      let minY = S;
-      let maxX = -1;
-      let maxY = -1;
-      for (let y = 0; y < S; y++) {
-        for (let x = 0; x < S; x++) {
-          const i = (y * S + x) * 4;
-          const lum = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
-          if (lum > 24) {
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-          }
-        }
-      }
-      if (maxX < minX || maxY < minY) return null;
-      const cx = (minX + maxX + 1) / (2 * S);
-      const cy = (minY + maxY + 1) / (2 * S);
-      const r = Math.max(maxX - minX + 1, maxY - minY + 1) / (2 * S);
-      if (r < 0.15 || r > 0.52) return null;
-      return { scale: r * 2, ox: cx - 0.5, oy: cy - 0.5 };
-    } catch (err) {
-      return null;
-    }
-  }
-
-  function syncFisheyeUI() {
-    $('#fishFov').value = state.fisheye.fov;
-    $('#fishScale').value = state.fisheye.scale * 100;
-    $('#fishOx').value = state.fisheye.ox * 100;
-    $('#fishOy').value = state.fisheye.oy * 100;
-  }
-
   function syncVideoUI() {
     if (!state.video) return;
     videoTime.max = String(Math.max(0, state.video.duration - 0.001));
     videoTime.value = String(state.videoTime);
     videoTimeOut.textContent =
       `${state.videoTime.toFixed(2)} / ${state.video.duration.toFixed(2)} s`;
-    videoBadge.textContent = `双鱼眼 · ${state.fisheye.fov.toFixed(0)}°`;
   }
 
   function setVideoStatus(text, busyFlag = false) {
@@ -2282,23 +2419,30 @@ void main() {
 
   function setVideoBusy(on) {
     videoBusy = on;
-    videoTime.disabled = on;
-    $('#extractBtn').disabled = on;
-    $('#openOsvTop').disabled = on || busy;
-    $('#openOsvEmpty').disabled = on || busy;
+    videoTime.disabled = on || busy;
+    $('#extractBtn').disabled = on || busy;
     $('#extractBtn').textContent = on ? '解码中…' : '抽取当前帧';
     if (on) setVideoStatus('解码中…', true);
   }
 
-  function setVideoModeUI(on) {
+  function setVideoModeUI(on, kind = state.video ? state.video.kind : null) {
     state.videoMode = on;
     videoSection.hidden = !on;
-    layoutField.hidden = on;
-    projectionField.hidden = on;
-    syncProjectionUI();
+    layoutField.hidden = on && kind === 'osv';
+    layoutHint.hidden = on && kind === 'osv';
+    if (!on) return;
+
+    const isOsv = kind === 'osv';
+    videoTitle.textContent = isOsv ? 'OSV 时间轴' : 'MP4 时间轴';
+    videoBadge.textContent = isOsv
+      ? '双鱼眼'
+      : (state.layout === 'sbs' ? 'SBS' : 'TB');
+    videoHint.textContent = isOsv
+      ? '时间轴松手后从最近的关键帧解码到目标帧；8K 双路约需 1–3 秒。'
+      : '时间轴松手后抽帧；按上面的立体布局切成左右眼。';
   }
 
-  async function loadOsvFile(file) {
+  async function loadOsvFile(file, parsedTracks = null) {
     if (!file) return;
     if (typeof VideoDecoder === 'undefined') {
       toast('此浏览器不支持 WebCodecs，请用 Chrome / Edge 打开');
@@ -2307,22 +2451,24 @@ void main() {
 
     const token = ++videoSeq;
     loadSeq++; // invalidate any still-image load
+    pendingSplit = false;
+    setVideoBusy(false); // cancel an extraction from the previous clip
     setBusy(true);
     setVideoStatus('解析 MP4…', true);
 
     const prev = {
       image: state.image ? { ...state.image } : null,
-      projection: state.projection,
-      fisheye: { ...state.fisheye },
       layout: state.layout,
-      stillProjection: state.stillProjection,
+      autoLayout: state.autoLayout,
+      swap: state.swap,
       video: state.video,
       videoMode: state.videoMode,
       videoTime: state.videoTime,
     };
+    let tookOver = false;
 
     try {
-      const tracks = await parseMp4(file);
+      const tracks = parsedTracks || await parseMp4(file);
       if (token !== videoSeq) return;
       if (tracks.length < 2) {
         throw new Error(`只找到 ${tracks.length} 条 HEVC 视频轨；需要 OSV 双鱼眼文件`);
@@ -2339,17 +2485,17 @@ void main() {
       const width = use[0].width;
       const height = use[0].height;
 
-      if (!state.videoMode) state.stillProjection = state.projection;
       state.video = {
+        kind: 'osv',
         file,
         name: file.name,
         tracks: use,
         duration: duration || 0,
         width,
         height,
-        circleAuto: true,
         frameLoaded: false,
       };
+      tookOver = true;
       state.videoTime = 0;
       state.image = {
         name: file.name,
@@ -2360,18 +2506,12 @@ void main() {
         originalWidth: width,
         originalHeight: height,
       };
-      state.projection = 'fisheye';
-      state.fisheye = { fov: OSV_FOV, scale: 0.833, ox: 0, oy: 0 };
       state.swap = false;
       $('#swapEyes').checked = false;
-      $('#projection').value = 'fisheye';
+      state.autoLayout = true;
       state.layout = 'sbs';
-      state.view = { yaw: 0, pitch: 0, fov: 80 };
+      setVideoModeUI(true, 'osv');
       syncLayoutUI();
-      syncViewUI();
-      setVideoModeUI(true);
-      syncFisheyeUI();
-      syncProjectionUI();
       syncVideoUI();
       setVideoStatus('解码首帧…', true);
 
@@ -2381,11 +2521,15 @@ void main() {
       updateHud();
 
       await extractOsvFrame(0);
-      if (token !== videoSeq) return;
-      if (!state.video || !state.video.frameLoaded) {
+      if (token !== videoSeq) {
+        if (prev.video && state.video !== prev.video) disposeVideoEntry(prev.video);
+        return;
+      }
+      if (!state.video || state.video.kind !== 'osv' || !state.video.frameLoaded) {
         throw new Error('首帧解码失败');
       }
 
+      if (prev.video && prev.video !== state.video) disposeVideoEntry(prev.video);
       state.bitmap?.close?.();
       state.bitmap = null;
       updateInfo();
@@ -2393,30 +2537,37 @@ void main() {
       updateGrid();
       toast(`已载入 ${file.name}（${state.video.duration.toFixed(1)} s，双鱼眼）`);
     } catch (err) {
+      if (token !== videoSeq) {
+        // A newer image / video load has taken over; keep its state.
+        if (tookOver && prev.video && state.video !== prev.video) {
+          disposeVideoEntry(prev.video);
+        }
+        return;
+      }
       console.error('[vr180] OSV load failed:', err);
       toast(`OSV 载入失败：${err && err.message ? err.message : err}`);
       setVideoStatus('载入失败', false);
-      if (!state.video || !state.video.frameLoaded) {
+      if (!state.video || state.video.kind !== 'osv' || !state.video.frameLoaded) {
         state.video = prev.videoMode ? prev.video : null;
         state.videoMode = prev.videoMode;
         state.videoTime = prev.videoTime;
-        setVideoModeUI(prev.videoMode);
         state.image = prev.image;
-        state.projection = prev.projection;
-        state.fisheye = prev.fisheye;
         state.layout = prev.layout;
-        state.stillProjection = prev.stillProjection;
-        $('#projection').value = state.projection;
-        syncFisheyeUI();
-        syncProjectionUI();
+        state.autoLayout = prev.autoLayout;
+        state.swap = prev.swap;
+        $('#swapEyes').checked = prev.swap;
+        setVideoModeUI(prev.videoMode, prev.video ? prev.video.kind : null);
         syncLayoutUI();
         if (prev.videoMode) {
           syncVideoUI();
           setVideoStatus('已恢复上一段视频', false);
         }
         empty.hidden = !!state.image;
+        hud.hidden = !state.image;
         updateInfo();
         updateHud();
+        updateGrid();
+        requestRender();
       }
     } finally {
       if (token === videoSeq) setBusy(false);
@@ -2450,7 +2601,6 @@ void main() {
 
       const lw = left.frame.displayWidth;
       const lh = left.frame.displayHeight;
-      const circle = state.video.circleAuto ? detectLensCircle(left.frame) : null;
       let texL;
       let texR;
       try {
@@ -2475,14 +2625,6 @@ void main() {
       state.videoTime = left.time;
       state.video.frameLoaded = true;
 
-      if (circle) {
-        state.fisheye.scale = circle.scale;
-        state.fisheye.ox = circle.ox;
-        state.fisheye.oy = circle.oy;
-        state.video.circleAuto = false;
-      }
-
-      syncFisheyeUI();
       syncVideoUI();
       updateInfo();
       updateHud();
@@ -2491,11 +2633,13 @@ void main() {
       const note = left.snapped ? '（就近关键帧）' : '';
       setVideoStatus(`帧 ${left.index} · ${left.time.toFixed(2)} s${note}`, false);
     } catch (err) {
-      console.error('[vr180] OSV decode failed:', err);
-      toast(`抽帧失败：${err && err.message ? err.message : err}`);
-      setVideoStatus('抽帧失败', false);
+      if (token === videoSeq) {
+        console.error('[vr180] OSV decode failed:', err);
+        toast(`抽帧失败：${err && err.message ? err.message : err}`);
+        setVideoStatus('抽帧失败', false);
+      }
     } finally {
-      setVideoBusy(false);
+      if (token === videoSeq) setVideoBusy(false);
     }
   }
 
@@ -2504,12 +2648,10 @@ void main() {
     loading.hidden = !on;
     const openTop = $('#openTop');
     const openEmpty = $('#openEmpty');
-    const openOsvTop = $('#openOsvTop');
-    const openOsvEmpty = $('#openOsvEmpty');
     if (openTop) openTop.disabled = on;
     if (openEmpty) openEmpty.disabled = on;
-    if (openOsvTop) openOsvTop.disabled = on;
-    if (openOsvEmpty) openOsvEmpty.disabled = on;
+    videoTime.disabled = on || videoBusy;
+    $('#extractBtn').disabled = on || videoBusy;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -2565,14 +2707,7 @@ void main() {
   }
 
   function resetView() {
-    if (state.displayMode === 'flat') {
-      resetFlatView();
-      return;
-    }
-    state.view = { yaw: 0, pitch: 0, fov: 80 };
-    syncViewUI();
-    updateHud();
-    requestRender();
+    resetFlatView();
   }
 
   function setFlatZoom(value) {
@@ -2587,50 +2722,10 @@ void main() {
     flatZoomOut.textContent = `${Math.round(state.flat.zoom * 100)}%`;
   }
 
-  function setDisplayMode(mode) {
-    if (mode !== 'flat' && mode !== 'persp') return;
-    state.displayMode = mode;
-    syncDisplayUI();
-    updateHud();
-    requestRender();
-  }
-
-  function syncDisplayUI() {
-    const flat = state.displayMode === 'flat';
-    $$('#displaySeg button').forEach((b) => {
-      b.classList.toggle('active', b.dataset.display === state.displayMode);
-    });
-    fovField.hidden = flat;
-    flatZoomField.hidden = !flat;
-    viewHint.textContent = flat
-      ? '原始画面按像素比例显示；拖动平移，滚轮缩放，双击回中。右眼只做 2D 平移/旋转/缩放。'
-      : '拖动画面环视，滚轮缩放，双击回中。差异模式中越黑越对齐。';
-    $('#poseHint').innerHTML = flat
-      ? '原始视图：右眼仅做 <b>2D 平移 / 旋转 / 缩放</b>，源画面不变形。'
-      : '右眼姿态：<span style="font-family: var(--mono); color: #c4d9ea;">R = Ry(yaw)·Rx(pitch)·Rz(roll)</span>';
-    syncFlatUI();
-    syncProjectionUI();
-  }
-
-  function setFov(value) {
-    state.view.fov = Math.round(clamp(Number(value) || 80, 5, 130) * 10) / 10;
-    syncViewUI();
-    updateHud();
-    requestRender();
-  }
-
-  function syncViewUI() {
-    fovRange.value = String(Math.round(state.view.fov));
-    fovOut.textContent = `${Math.round(state.view.fov)}°`;
-  }
-
   function updateHud() {
-    const v = state.view;
     const a = state.angles;
     $('#hudMode').textContent = MODE_LABELS[state.mode];
-    $('#hudView').innerHTML = state.displayMode === 'flat'
-      ? `原始视图 · 缩放 <b>${Math.round(state.flat.zoom * 100)}%</b>`
-      : `视线 <b>${v.yaw.toFixed(1)}°</b> / <b>${v.pitch.toFixed(1)}°</b> · 视场 <b>${Math.round(v.fov)}°</b>`;
+    $('#hudView').innerHTML = `原始视图 · 缩放 <b>${Math.round(state.flat.zoom * 100)}%</b>`;
     $('#hudAngles').innerHTML =
       `<span><em>yaw</em> <b>${signed(a.yaw)}</b></span>` +
       `<span><em>pitch</em> <b>${signed(a.pitch)}</b></span>` +
@@ -2638,7 +2733,7 @@ void main() {
       `<span><em>zoom</em> <b>${state.zoom.toFixed(3)}</b></span>`;
     modeBadge.textContent = MODE_LABELS[state.mode];
     $('#stereoEq').textContent =
-      `stereo_*  yaw ${signed(a.yaw / 2)}°  pitch ${signed(a.pitch / 2)}°  roll ${signed(a.roll / 2)}°`;
+      `右眼  yaw ${signed(a.yaw)}°  pitch ${signed(a.pitch)}°  roll ${signed(a.roll)}°`;
   }
 
   function updateInfo() {
@@ -2646,18 +2741,29 @@ void main() {
     if (!img) {
       fileInfo.hidden = true;
       imageBadge.textContent = '未载入';
-      if (hfovHint) hfovHint.textContent = '当前：180°';
       return;
     }
 
     if (state.videoMode && state.video) {
+      const v = state.video;
+      const seconds = Number.isFinite(v.duration) ? v.duration.toFixed(2) : '0.00';
       fileInfo.hidden = false;
-      fileName.textContent = state.video.name;
-      fileName.title = state.video.name;
-      fileDims.textContent =
-        `${state.video.width} × ${state.video.height} · ${state.video.duration.toFixed(2)} s`;
-      imageBadge.textContent = `OSV ${state.video.width}²/眼`;
-      videoBadge.textContent = `双鱼眼 · ${state.fisheye.fov.toFixed(0)}°`;
+      fileName.textContent = v.name;
+      fileName.title = v.name;
+
+      if (v.kind === 'osv') {
+        fileDims.textContent = `${v.width} × ${v.height} · ${seconds} s`;
+        imageBadge.textContent = `OSV ${v.width}²/眼`;
+        videoBadge.textContent = '双鱼眼';
+      } else {
+        const layoutLabel = state.layout === 'sbs' ? 'SBS' : 'TB';
+        fileDims.textContent = `${v.width} × ${v.height} · ${layoutLabel} · ${seconds} s`;
+        imageBadge.textContent = state.eyeSize
+          ? `每眼 ${state.eyeSize.w} × ${state.eyeSize.h}`
+          : 'MP4';
+        videoBadge.textContent = layoutLabel;
+      }
+
       updateHud();
       return;
     }
@@ -2673,10 +2779,6 @@ void main() {
       ? `每眼 ${state.eyeSize.w} × ${state.eyeSize.h}`
       : `${img.width} × ${img.height}`;
 
-    if (hfovHint) {
-      const mode = state.hfovMode === 'auto' ? '自动 · ' : '';
-      hfovHint.textContent = `当前：${mode}${resolvedHfovDeg()}°`;
-    }
     updateHud();
   }
 
@@ -2688,6 +2790,9 @@ void main() {
     $$('#layoutSeg button').forEach((b) => {
       b.classList.toggle('active', b.dataset.layout === state.layout);
     });
+    if (state.videoMode && state.video && state.video.kind === 'mp4') {
+      videoBadge.textContent = state.layout === 'sbs' ? 'SBS' : 'TB';
+    }
   }
 
   function syncModeUI() {
@@ -2696,23 +2801,7 @@ void main() {
     });
   }
 
-  function syncProjectionUI() {
-    const flat = state.displayMode === 'flat';
-    if (flat) {
-      $('#equirectOpts').hidden = true;
-      $('#fisheyeOpts').hidden = true;
-      projectionField.hidden = true;
-    } else {
-      const fish = state.videoMode || state.projection === 'fisheye';
-      $('#equirectOpts').hidden = fish;
-      $('#fisheyeOpts').hidden = !fish;
-      projectionField.hidden = state.videoMode;
-    }
-    layoutField.hidden = state.videoMode;
-  }
-
   function setLayout(layout) {
-    if (state.videoMode) return;
     if (layout !== 'sbs' && layout !== 'tb') return;
     if (state.layout === layout) return;
     state.layout = layout;
@@ -2720,6 +2809,15 @@ void main() {
     syncLayoutUI();
     updateInfo();
     updateHud();
+
+    if (state.videoMode) {
+      if (state.video && state.video.kind === 'mp4') {
+        if (videoBusy) pendingSplit = true;
+        else extractMp4Frame(state.videoTime);
+      }
+      return;
+    }
+
     if (state.bitmap) {
       buildEyeTextures().catch((err) => {
         console.error('[vr180] texture rebuild failed:', err);
@@ -2732,24 +2830,6 @@ void main() {
   function setSwap(on) {
     state.swap = !!on;
     $('#swapEyes').checked = state.swap;
-    requestRender();
-  }
-
-  function setProjection(projection) {
-    if (state.videoMode) return;
-    if (projection !== 'equirect' && projection !== 'fisheye') return;
-    state.projection = projection;
-    $('#projection').value = projection;
-    syncProjectionUI();
-    updateInfo();
-    requestRender();
-  }
-
-  function setHfovMode(mode) {
-    if (!['auto', '180', '360'].includes(mode)) return;
-    state.hfovMode = mode;
-    $('#hfovMode').value = mode;
-    updateInfo();
     requestRender();
   }
 
@@ -2771,8 +2851,7 @@ void main() {
   async function copyParams() {
     const a = state.angles;
     const text =
-      `VR180 右眼校正  yaw ${signed(a.yaw)}°  pitch ${signed(a.pitch)}°  roll ${signed(a.roll)}°  zoom ${state.zoom.toFixed(3)}\n` +
-      `Silver Bullet stereo_*  yaw ${signed(a.yaw / 2)}°  pitch ${signed(a.pitch / 2)}°  roll ${signed(a.roll / 2)}°`;
+      `VR180 右眼校正  yaw ${signed(a.yaw)}°  pitch ${signed(a.pitch)}°  roll ${signed(a.roll)}°  zoom ${state.zoom.toFixed(3)}`;
     let ok = false;
     try {
       await navigator.clipboard.writeText(text);
@@ -2795,9 +2874,6 @@ void main() {
   // ════════════════════════════════════════════════════════════════
   //  Interaction
   // ════════════════════════════════════════════════════════════════
-  function wrap180(deg) {
-    return ((deg + 180) % 360 + 360) % 360 - 180;
-  }
 
   // ── angles ───────────────────────────────────────────────────────
   AXES.forEach((axis) => {
@@ -2873,7 +2949,7 @@ void main() {
 
   $('#resetAngles').addEventListener('click', resetAngles);
 
-  // ── modes / layout / projection ──────────────────────────────────
+  // ── modes / layout ───────────────────────────────────────────────
   $('#layoutSeg').addEventListener('click', (e) => {
     const btn = e.target.closest('button[data-layout]');
     if (btn) setLayout(btn.dataset.layout);
@@ -2886,52 +2962,8 @@ void main() {
 
   $('#swapEyes').addEventListener('change', (e) => setSwap(e.target.checked));
 
-  $('#projection').addEventListener('change', (e) => setProjection(e.target.value));
-
-  $('#hfovMode').addEventListener('change', (e) => setHfovMode(e.target.value));
-
-  // ── fisheye controls ─────────────────────────────────────────────
-  function bindFishInput(id, read, write) {
-    const el = $(id);
-    el.addEventListener('input', () => {
-      const raw = parseFloat(el.value);
-      if (!Number.isFinite(raw)) return;
-      if (state.video) state.video.circleAuto = false;
-      write(clamp(raw, Number(el.min), Number(el.max)));
-      if (state.videoMode) updateInfo();
-      requestRender();
-    });
-    el.addEventListener('change', () => {
-      const raw = parseFloat(el.value);
-      const v = Number.isFinite(raw) ? clamp(raw, Number(el.min), Number(el.max)) : read();
-      if (state.video) state.video.circleAuto = false;
-      write(v);
-      el.value = String(read());
-      if (state.videoMode) updateInfo();
-      requestRender();
-    });
-  }
-
-  bindFishInput('#fishFov',
-    () => state.fisheye.fov,
-    (v) => { state.fisheye.fov = v; });
-  bindFishInput('#fishScale',
-    () => state.fisheye.scale * 100,
-    (v) => { state.fisheye.scale = v / 100; });
-  bindFishInput('#fishOx',
-    () => state.fisheye.ox * 100,
-    (v) => { state.fisheye.ox = v / 100; });
-  bindFishInput('#fishOy',
-    () => state.fisheye.oy * 100,
-    (v) => { state.fisheye.oy = v / 100; });
-
   // ── view controls ────────────────────────────────────────────────
-  fovRange.addEventListener('input', () => setFov(Number(fovRange.value)));
   flatZoomRange.addEventListener('input', () => setFlatZoom(Number(flatZoomRange.value)));
-  $('#displaySeg').addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-display]');
-    if (btn) setDisplayMode(btn.dataset.display);
-  });
   $('#resetView').addEventListener('click', resetView);
 
   $('#gridToggle').addEventListener('change', (e) => {
@@ -2955,19 +2987,8 @@ void main() {
     dragState.x = e.clientX;
     dragState.y = e.clientY;
 
-    if (state.displayMode === 'flat') {
-      state.flat.panX += dx;
-      state.flat.panY += dy;
-      requestRender();
-      return;
-    }
-
-    const height = Math.max(1, stage.getBoundingClientRect().height);
-    const degPerPx = state.view.fov / height;
-    state.view.yaw = wrap180(state.view.yaw - dx * degPerPx);
-    state.view.pitch = clamp(state.view.pitch + dy * degPerPx, -89, 89);
-
-    updateHud();
+    state.flat.panX += dx;
+    state.flat.panY += dy;
     requestRender();
   });
 
@@ -2985,11 +3006,7 @@ void main() {
     e.preventDefault();
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1;
     const dy = e.deltaY * unit;
-    if (state.displayMode === 'flat') {
-      setFlatZoom(state.flat.zoom * Math.exp(-dy * 0.0012));
-    } else {
-      setFov(state.view.fov * Math.exp(dy * 0.0012));
-    }
+    setFlatZoom(state.flat.zoom * Math.exp(-dy * 0.0012));
   }, { passive: false });
 
   canvas.addEventListener('dblclick', () => {
@@ -3038,13 +3055,8 @@ void main() {
   function openPicker() {
     fileInput.click();
   }
-  function openOsvPicker() {
-    osvInput.click();
-  }
   $('#openTop').addEventListener('click', openPicker);
   $('#openEmpty').addEventListener('click', openPicker);
-  $('#openOsvTop').addEventListener('click', openOsvPicker);
-  $('#openOsvEmpty').addEventListener('click', openOsvPicker);
 
   fileInput.addEventListener('change', () => {
     const file = fileInput.files && fileInput.files[0];
@@ -3052,13 +3064,7 @@ void main() {
     fileInput.value = '';
   });
 
-  osvInput.addEventListener('change', () => {
-    const file = osvInput.files && osvInput.files[0];
-    if (file) loadOsvFile(file);
-    osvInput.value = '';
-  });
-
-  // ── OSV timeline ────────────────────────────────────────────────
+  // ── video timeline ──────────────────────────────────────────────
   videoTime.addEventListener('input', () => {
     if (!state.video) return;
     state.videoTime = Number(videoTime.value) || 0;
@@ -3068,12 +3074,12 @@ void main() {
 
   videoTime.addEventListener('change', () => {
     if (!state.video) return;
-    extractOsvFrame(Number(videoTime.value) || 0);
+    extractFrame(Number(videoTime.value) || 0);
   });
 
   $('#extractBtn').addEventListener('click', () => {
     if (!state.video) return;
-    extractOsvFrame(Number(videoTime.value) || 0);
+    extractFrame(Number(videoTime.value) || 0);
   });
 
   function hasFiles(e) {
@@ -3161,7 +3167,9 @@ void main() {
 
   canvas.addEventListener('webglcontextrestored', () => {
     if (!initGL()) return;
-    if (state.bitmap) {
+    if (state.videoMode && state.video) {
+      extractFrame(state.videoTime);
+    } else if (state.bitmap) {
       buildEyeTextures().catch((err) => {
         console.error('[vr180] restore failed:', err);
       });
@@ -3177,8 +3185,6 @@ void main() {
 
     syncLayoutUI();
     syncModeUI();
-    syncDisplayUI();
-    syncViewUI();
     updateInfo();
     updateHud();
 
@@ -3202,24 +3208,10 @@ void main() {
     getAngles: () => ({ ...state.angles }),
     setZoom: (value) => setZoom(value),
     getZoom: () => state.zoom,
-    setView: (view) => {
-      if (!view) return;
-      if (Number.isFinite(Number(view.yaw))) state.view.yaw = wrap180(Number(view.yaw));
-      if (Number.isFinite(Number(view.pitch))) state.view.pitch = clamp(Number(view.pitch), -89, 89);
-      if (Number.isFinite(Number(view.fov))) state.view.fov = clamp(Number(view.fov), 5, 130);
-      syncViewUI();
-      updateHud();
-      requestRender();
-    },
-    getView: () => ({ ...state.view }),
     setMode,
     setLayout,
     setSwap,
-    setProjection,
-    setHfovMode,
-    setDisplayMode,
     setFlatZoom,
-    getDisplayMode: () => state.displayMode,
     setFlatView: (view) => {
       if (!view) return;
       if (Number.isFinite(Number(view.zoom))) state.flat.zoom = clamp(Number(view.zoom), 1, 8);
@@ -3229,42 +3221,34 @@ void main() {
       updateHud();
       requestRender();
     },
-    setFisheye: (patch) => {
-      if (!patch) return;
-      if (state.video) state.video.circleAuto = false;
-      if (Number.isFinite(Number(patch.fov))) state.fisheye.fov = clamp(Number(patch.fov), 120, 220);
-      if (Number.isFinite(Number(patch.scale))) state.fisheye.scale = clamp(Number(patch.scale), 0.5, 1.2);
-      if (Number.isFinite(Number(patch.ox))) state.fisheye.ox = clamp(Number(patch.ox), -0.25, 0.25);
-      if (Number.isFinite(Number(patch.oy))) state.fisheye.oy = clamp(Number(patch.oy), -0.25, 0.25);
-      syncFisheyeUI();
-      if (state.videoMode) updateInfo();
-      requestRender();
+    loadVideo: (file) => loadVideoFile(file),
+    loadOsv: (file) => {
+      videoRequest += 1;
+      return loadOsvFile(file);
     },
-    loadOsv: (file) => loadOsvFile(file),
+    extract: (timeSec) => extractFrame(timeSec),
     extractOsv: (timeSec) => extractOsvFrame(timeSec),
     getInfo: () => ({
       image: state.image ? { ...state.image } : null,
       eyeSize: state.eyeSize ? { ...state.eyeSize } : null,
       layout: state.layout,
-      projection: state.projection,
-      displayMode: state.displayMode,
       flat: { ...state.flat },
       videoMode: state.videoMode,
       videoBusy,
       videoTime: state.videoTime,
       video: state.video ? {
+        kind: state.video.kind,
         name: state.video.name,
         width: state.video.width,
         height: state.video.height,
         duration: state.video.duration,
-        tracks: state.video.tracks.length,
-        samples: state.video.tracks.map((t) => t.samples.length),
-        fps: state.video.tracks.map((t) => t.fps),
+        frameLoaded: !!state.video.frameLoaded,
+        tracks: state.video.tracks ? state.video.tracks.length : 0,
+        samples: state.video.tracks ? state.video.tracks.map((t) => t.samples.length) : [],
+        fps: state.video.tracks ? state.video.tracks.map((t) => t.fps) : [],
       } : null,
-      hfovDeg: resolvedHfovDeg(),
       angles: { ...state.angles },
       zoom: state.zoom,
-      view: { ...state.view },
       mode: state.mode,
       glReady,
     }),
