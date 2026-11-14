@@ -417,12 +417,6 @@
   .empty-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 9px; }
   .empty-note { margin: 16px 0 0 !important; color: var(--dim) !important; font-size: 10.5px !important; }
 
-  .video-actions { display: flex; align-items: center; gap: 10px; margin-top: 11px; }
-  .video-actions .btn { height: 30px; font-size: 12px; }
-  .video-status { color: var(--dim); font-family: var(--mono); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .video-status.busy { color: var(--accent); }
-  #videoSection .hint { margin-top: 9px; }
-
   #dropHint {
     position: absolute;
     inset: 12px;
@@ -703,13 +697,6 @@
           <span class="mono" id="videoTimeOut">0.00 / 0.00 s</span>
         </div>
         <input id="videoTime" type="range" min="0" max="1" step="0.01" value="0" aria-label="视频抽帧时间">
-
-        <div class="video-actions">
-          <button class="btn" id="extractBtn" type="button">抽取当前帧</button>
-          <span class="video-status" id="videoStatus">松手即抽帧</span>
-        </div>
-
-        <p class="hint" id="videoHint">时间轴松手后从最近的关键帧解码到目标帧；8K 双路约需 1–3 秒。</p>
       </section>
 
       <section class="section">
@@ -790,14 +777,6 @@
           <button type="button" data-mode="right">右眼</button>
         </div>
 
-        <div class="field" id="flatZoomField">
-          <div class="field-line">
-            <label for="flatZoomRange">视图缩放</label>
-            <span class="mono" id="flatZoomOut">100%</span>
-          </div>
-          <input id="flatZoomRange" type="range" min="1" max="8" step="0.01" value="1" aria-label="视图缩放">
-        </div>
-
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px;">
           <button class="btn" id="resetView" type="button">视图回中</button>
           <label class="check" style="margin-top: 0;"><input type="checkbox" id="gridToggle"> 网格</label>
@@ -830,7 +809,7 @@
           <p>若 MP4 内是同一条画面里的左右或上下双画面，按「立体布局」切分；若文件里有两条独立视频轨（OSV 双鱼眼），则会自动按双轨读取，不切分布局。</p>
 
           <h3>OSV 双鱼眼视频</h3>
-          <p>同样用「打开文件」选择 <span style="font-family: var(--mono);">.osv</span>，或包含两条 HEVC 视频轨的 MP4；工具会自动识别并切到双轨模式。它读取 MP4 里的两条 HEVC 视频轨，用 WebCodecs 解码首帧；拖动时间轴后松手（或点「抽取当前帧」）会从最近的关键帧解到目标帧。<kbd>Chrome</kbd> / <kbd>Edge</kbd> 且系统支持 HEVC 硬解时可用。</p>
+          <p>同样用「打开文件」选择 <span style="font-family: var(--mono);">.osv</span>，或包含两条 HEVC 视频轨的 MP4；工具会自动识别并切到双轨模式。它读取 MP4 里的两条 HEVC 视频轨，用 WebCodecs 解码首帧；拖动时间轴后松手会从最近的关键帧解到目标帧。<kbd>Chrome</kbd> / <kbd>Edge</kbd> 且系统支持 HEVC 硬解时可用。</p>
           <p>鱼眼帧按源像素直接显示，不做球面去畸变；不解析 <span style="font-family: var(--mono);">djmd</span> 标定；若左右眼反了，勾选「交换左右眼」。8K 双路抽帧约 1–3 秒。</p>
 
           <h3>对齐</h3>
@@ -933,15 +912,11 @@
   const fileDims = $('#fileDims');
   const imageBadge = $('#imageBadge');
   const modeBadge = $('#modeBadge');
-  const flatZoomRange = $('#flatZoomRange');
-  const flatZoomOut = $('#flatZoomOut');
   const videoSection = $('#videoSection');
   const videoTitle = $('#videoTitle');
   const videoBadge = $('#videoBadge');
-  const videoHint = $('#videoHint');
   const videoTime = $('#videoTime');
   const videoTimeOut = $('#videoTimeOut');
-  const videoStatus = $('#videoStatus');
   const layoutField = $('#layoutField');
   const layoutHint = $('#layoutHint');
 
@@ -1727,7 +1702,6 @@ void main() {
     setVideoBusy(true);
 
     try {
-      setVideoStatus('定位中…', true);
       const actual = await seekVideo(video, timeSec);
       if (token !== videoSeq || state.video !== entry) return;
 
@@ -1762,7 +1736,6 @@ void main() {
       rctx.imageSmoothingEnabled = true;
       rctx.imageSmoothingQuality = 'high';
 
-      setVideoStatus('抽帧中…', true);
       lctx.drawImage(video, lx, ly, ew, eh, 0, 0, cw, ch);
       rctx.drawImage(video, rx, ry, ew, eh, 0, 0, cw, ch);
 
@@ -1797,14 +1770,10 @@ void main() {
       updateInfo();
       updateHud();
       requestRender();
-
-      const scaleNote = fit.scaled ? '（已缩小）' : '';
-      setVideoStatus(`帧 @ ${actual.toFixed(2)} s${scaleNote}`, false);
     } catch (err) {
       if (token === videoSeq) {
         console.error('[vr180] MP4 frame failed:', err);
         toast(`抽帧失败：${err && err.message ? err.message : err}`);
-        setVideoStatus('抽帧失败', false);
       }
     } finally {
       if (token === videoSeq) {
@@ -1824,7 +1793,6 @@ void main() {
     pendingSplit = false;
     setVideoBusy(false); // cancel an extraction from the previous clip
     setBusy(true);
-    setVideoStatus('读取视频…', true);
 
     const prev = {
       image: state.image ? { ...state.image } : null,
@@ -1900,7 +1868,6 @@ void main() {
       }
       console.error('[vr180] MP4 load failed:', err);
       toast(`MP4 载入失败：${err && err.message ? err.message : err}`);
-      setVideoStatus('载入失败', false);
       if (entry && entry !== prev.video) disposeVideoEntry(entry);
       state.video = prev.videoMode ? prev.video : null;
       state.videoMode = prev.videoMode;
@@ -1912,7 +1879,6 @@ void main() {
       syncLayoutUI();
       if (prev.videoMode && prev.video) {
         syncVideoUI();
-        setVideoStatus('已恢复上一段视频', false);
       }
       empty.hidden = !!state.image;
       hud.hidden = !state.image;
@@ -2416,17 +2382,9 @@ void main() {
       `${state.videoTime.toFixed(2)} / ${state.video.duration.toFixed(2)} s`;
   }
 
-  function setVideoStatus(text, busyFlag = false) {
-    videoStatus.textContent = text;
-    videoStatus.classList.toggle('busy', busyFlag);
-  }
-
   function setVideoBusy(on) {
     videoBusy = on;
     videoTime.disabled = on || busy;
-    $('#extractBtn').disabled = on || busy;
-    $('#extractBtn').textContent = on ? '解码中…' : '抽取当前帧';
-    if (on) setVideoStatus('解码中…', true);
   }
 
   function setVideoModeUI(on, kind = state.video ? state.video.kind : null) {
@@ -2441,9 +2399,6 @@ void main() {
     videoBadge.textContent = isOsv
       ? '双鱼眼'
       : (state.layout === 'sbs' ? 'SBS' : 'TB');
-    videoHint.textContent = isOsv
-      ? '时间轴松手后从最近的关键帧解码到目标帧；8K 双路约需 1–3 秒。'
-      : '时间轴松手后抽帧；按上面的立体布局切成左右眼。';
   }
 
   async function loadOsvFile(file, parsedTracks = null) {
@@ -2458,7 +2413,6 @@ void main() {
     pendingSplit = false;
     setVideoBusy(false); // cancel an extraction from the previous clip
     setBusy(true);
-    setVideoStatus('解析 MP4…', true);
 
     const prev = {
       image: state.image ? { ...state.image } : null,
@@ -2517,7 +2471,6 @@ void main() {
       setVideoModeUI(true, 'osv');
       syncLayoutUI();
       syncVideoUI();
-      setVideoStatus('解码首帧…', true);
 
       empty.hidden = true;
       hud.hidden = false;
@@ -2550,7 +2503,6 @@ void main() {
       }
       console.error('[vr180] OSV load failed:', err);
       toast(`OSV 载入失败：${err && err.message ? err.message : err}`);
-      setVideoStatus('载入失败', false);
       if (!state.video || state.video.kind !== 'osv' || !state.video.frameLoaded) {
         state.video = prev.videoMode ? prev.video : null;
         state.videoMode = prev.videoMode;
@@ -2564,7 +2516,6 @@ void main() {
         syncLayoutUI();
         if (prev.videoMode) {
           syncVideoUI();
-          setVideoStatus('已恢复上一段视频', false);
         }
         empty.hidden = !!state.image;
         hud.hidden = !state.image;
@@ -2633,14 +2584,10 @@ void main() {
       updateInfo();
       updateHud();
       requestRender();
-
-      const note = left.snapped ? '（就近关键帧）' : '';
-      setVideoStatus(`帧 ${left.index} · ${left.time.toFixed(2)} s${note}`, false);
     } catch (err) {
       if (token === videoSeq) {
         console.error('[vr180] OSV decode failed:', err);
         toast(`抽帧失败：${err && err.message ? err.message : err}`);
-        setVideoStatus('抽帧失败', false);
       }
     } finally {
       if (token === videoSeq) setVideoBusy(false);
@@ -2655,7 +2602,6 @@ void main() {
     if (openTop) openTop.disabled = on;
     if (openEmpty) openEmpty.disabled = on;
     videoTime.disabled = on || videoBusy;
-    $('#extractBtn').disabled = on || videoBusy;
   }
 
   // ════════════════════════════════════════════════════════════════
@@ -2705,7 +2651,6 @@ void main() {
 
   function resetFlatView() {
     state.flat = { zoom: 1, panX: 0, panY: 0 };
-    syncFlatUI();
     updateHud();
     requestRender();
   }
@@ -2716,14 +2661,8 @@ void main() {
 
   function setFlatZoom(value) {
     state.flat.zoom = Math.round(clamp(Number(value) || 1, 1, 8) * 100) / 100;
-    syncFlatUI();
     updateHud();
     requestRender();
-  }
-
-  function syncFlatUI() {
-    flatZoomRange.value = String(state.flat.zoom);
-    flatZoomOut.textContent = `${Math.round(state.flat.zoom * 100)}%`;
   }
 
   function updateHud() {
@@ -2967,7 +2906,6 @@ void main() {
   $('#swapEyes').addEventListener('change', (e) => setSwap(e.target.checked));
 
   // ── view controls ────────────────────────────────────────────────
-  flatZoomRange.addEventListener('input', () => setFlatZoom(Number(flatZoomRange.value)));
   $('#resetView').addEventListener('click', resetView);
 
   $('#gridToggle').addEventListener('change', (e) => {
@@ -3077,11 +3015,6 @@ void main() {
   });
 
   videoTime.addEventListener('change', () => {
-    if (!state.video) return;
-    extractFrame(Number(videoTime.value) || 0);
-  });
-
-  $('#extractBtn').addEventListener('click', () => {
     if (!state.video) return;
     extractFrame(Number(videoTime.value) || 0);
   });
@@ -3221,7 +3154,6 @@ void main() {
       if (Number.isFinite(Number(view.zoom))) state.flat.zoom = clamp(Number(view.zoom), 1, 8);
       if (Number.isFinite(Number(view.panX))) state.flat.panX = Number(view.panX);
       if (Number.isFinite(Number(view.panY))) state.flat.panY = Number(view.panY);
-      syncFlatUI();
       updateHud();
       requestRender();
     },
